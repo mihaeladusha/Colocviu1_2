@@ -19,6 +19,7 @@
         </activity>
 
         <activity android:name=".Colocviu1_2SecondaryActivity" />
+        <service android:name=".Colocviu1_2Service" />
     </application>
 
 </manifest>
