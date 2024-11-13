@@ -21,6 +21,9 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
     private Button addButton;
     private Button computeButton;
 
+    private int lastComputedSum = 0;
+    private String lastAllTerms = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +34,12 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
         allTermsTextView = findViewById(R.id.all_terms);
         addButton = findViewById(R.id.add_button);
         computeButton = findViewById(R.id.compute_button);
+
+        if (savedInstanceState != null) {
+            lastComputedSum = savedInstanceState.getInt("lastComputedSum", 0);
+            lastAllTerms = savedInstanceState.getString("lastAllTerms", "");
+            allTermsTextView.setText(savedInstanceState.getString("allTermsText", ""));
+        }
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,9 +62,14 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
         computeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Colocviu1_2MainActivity.this, Colocviu1_2SecondaryActivity.class);
-                intent.putExtra("allTerms", allTermsTextView.getText().toString());
-                startActivityForResult(intent, 1);
+                String currentAllTerms = allTermsTextView.getText().toString();
+                if (currentAllTerms.equals(lastAllTerms)) {
+                    Toast.makeText(Colocviu1_2MainActivity.this, "Sum: " + lastComputedSum, Toast.LENGTH_LONG).show();
+                } else {
+                    Intent intent = new Intent(Colocviu1_2MainActivity.this, Colocviu1_2SecondaryActivity.class);
+                    intent.putExtra("allTerms", currentAllTerms);
+                    startActivityForResult(intent, 1);
+                }
             }
         });
 
@@ -67,11 +81,20 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("lastComputedSum", lastComputedSum);
+        outState.putString("lastAllTerms", lastAllTerms);
+        outState.putString("allTermsText", allTermsTextView.getText().toString());
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            int result = data.getIntExtra("result", 0);
-            Toast.makeText(this, "Sum: " + result, Toast.LENGTH_LONG).show();
+            lastComputedSum = data.getIntExtra("result", 0);
+            lastAllTerms = allTermsTextView.getText().toString();
+            Toast.makeText(this, "Sum: " + lastComputedSum, Toast.LENGTH_LONG).show();
         }
     }
 }
